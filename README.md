@@ -15,6 +15,8 @@
 ## Part B. Web Camera
 
 **a. Compare `helloYou/server.js` and `IDD-Fa18-Lab7/pictureServer.js`. What elements had to be added or changed to enable the web camera? (Hint: It might be good to know that there is a UNIX command called `diff` that compares files.)**
+We import the module NodeWebCam. We define a set of options for the camera to operate such camera height, width, quality, etc this is saved in a object called opts. We also define a case when the user selects "Take a picture". And in here
+the line NodeWebCam.capture to take the picture and we display the picture in the main UI, with the ui.emit function.
 
 **b. Include a video of your working video doorbell**
 
