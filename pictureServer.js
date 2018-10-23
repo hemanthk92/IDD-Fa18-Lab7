@@ -21,6 +21,7 @@ line input.
 
 var express = require('express'); // web server application
 var app = express(); // webapp
+var Jimp = require('jimp');
 var http = require('http').Server(app); // connects http library to server
 var io = require('socket.io')(http); // connect websocket library to server
 var serverPort = 8000;
@@ -98,6 +99,10 @@ parser.on('data', function(data) {
 io.on('connect', function(socket) {
   console.log('a user connected');
 
+  socket.on('server-msg', function() {
+    console.log('We here!!!');
+
+  });
   // if you get the 'ledON' msg, send an 'H' to the Arduino
   socket.on('ledON', function() {
     console.log('ledON');
@@ -112,20 +117,33 @@ io.on('connect', function(socket) {
 
   //-- Addition: This function is called when the client clicks on the `Take a picture` button.
   socket.on('takePicture', function() {
-    /// First, we create a name for the new picture.
-    /// The .replace() function removes all special characters from the date.
-    /// This way we can use it as the filename.
-    var imageName = new Date().toString().replace(/[&\/\\#,+()$~%.'":*?<>{}\s-]/g, '');
+     /// First, we create a name for the new picture.
+     /// The .replace() function removes all special characters from the date.
+     /// This way we can use it as the filename.
+     var imageName = new Date().toString().replace(/[&\/\\#,+()$~%.'":*?<>{}\s-]/g, '');
 
-    console.log('making a making a picture at'+ imageName); // Second, the name is logged to the console.
+     console.log('making a making a picture at'+ imageName); // Second, the name is logged to the console.
 
-    //Third, the picture is  taken and saved to the `public/`` folder
-    NodeWebcam.capture('public/'+imageName, opts, function( err, data ) {
-    io.emit('newPicture',(imageName+'.jpg')); ///Lastly, the new name is send to the client web browser.
-    /// The browser will take this new name and load the picture from the public folder.
-  });
+     //Third, the picture is  taken and saved to the `public/`` folder
+     NodeWebcam.capture('public/'+imageName, opts, function( err, data ) {
+        //io.emit('newPicture',('tonym'+'.jpg')); ///Lastly, the new name is send to the client web browser.
+     /// The browser will take this new name and load the picture from the public folder.
+     //var font = Jimp.loadFont('A-Sensible-Armadillo.ttf');
 
-  });
+     Jimp.read('public/'+imageName + '.jpg', (err, lenna) => {
+         if (err) throw err;
+         lenna
+           .resize(256, 256) // resize
+           .quality(60) // set JPEG quality
+           .invert() // set greyscale
+           .write('public/display.jpg'); // save
+        });
+      });
+
+
+      io.emit('newPicture',('display'+'.jpg'));
+
+   });
   // if you get the 'disconnect' message, say the user disconnected
   socket.on('disconnect', function() {
     console.log('user disconnected');

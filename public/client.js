@@ -39,10 +39,11 @@ socket.on('newPicture', function(msg) {
 socket.on('server-msg', function(msg) {
   msg = msg.toString();
   console.log('msg:', msg);
+  socket.emit('takePicture');
   switch (msg) {
     case "light":
       document.body.style.backgroundColor = "white";
-      console.log("white")
+      console.log("white");
       break;
     case "dark":
       document.body.style.backgroundColor = "black";
